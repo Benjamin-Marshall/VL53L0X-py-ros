@@ -51,10 +51,21 @@ class rangeNode(Node):
 		elif self.calls == 25:
 			self.tare = self.int_distance / 25
 			self.calls += 1
-		# We have now call 25 readings and gotten the average, tare the sensor and read as normal
+			print("Tare Val mm: %d" % self.tare)
+		# We have now called 25 readings and gotten the average, tare the sensor and read as normal
 		else:
 			distance_out = self.sensorObject.get_distance() - self.tare
-			print("distance: %d \t tare value: %d" % (distance_out, self.tare))
+			#print("distance: %d \t tare value: %d" % (distance_out, self.tare))
+			
+			msg = PointStamped()
+			msg.point.x = distance_out
+			msg.point.y = self.tare
+			msg.point.z = float(0)
+			msg.header.stamp = self.get_clock().now().to_msg()
+
+			self.publisher.publish(msg)
+
+
 def main(args=None):
 
 	rclpy.init(args=args)
@@ -67,27 +78,4 @@ def main(args=None):
 if __name__ == '__main__':
 
 	main()
-
-	## Create a VL53L0X object
-#tof = VL53L0X.VL53L0X(i2c_bus=1,i2c_address=0x29)
-	## I2C Address can change before tof.open()
-	## tof.change_address(0x32)
-#tof.open()
-	## Start ranging
-#tof.start_ranging(VL53L0X.Vl53l0xAccuracyMode.BETTER)
-
-#timing = tof.get_timing()
-#if timing < 20000:
-#    timing = 20000
-#print("Timing %d ms" % (timing/1000))
-
-#for count in range(1, 101):
- #   distance = tof.get_distance()
-  #  if distance > 0:
-   #     print("%d mm, %d cm, %d" % (distance, (distance/10), count))
-
-    #time.sleep(timing/1000000.00)
-
-#tof.stop_ranging()
-#tof.close()
 
